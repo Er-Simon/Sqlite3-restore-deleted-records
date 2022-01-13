@@ -1,6 +1,6 @@
 <h1>SQLite3 - Restore Deleted Records</h1>
 
-È uno script python che permette di recuperare i record cancellati, più nello specifico utilizza lo spazio non allocato delle Table B-tree pages e dei freeblocks presenti nelle pagine di questo tipo
+È uno script python che permette di recuperare i record cancellati, più nello specifico utilizza lo spazio non allocato delle leaf table B-tree pages e dei freeblocks presenti nelle pagine di questo tipo
 
 Lo script è stato testato su file SQLite del formato 3
 
