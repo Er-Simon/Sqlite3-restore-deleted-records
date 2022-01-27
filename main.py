@@ -17,6 +17,10 @@ unallocated_area, free_block_area = extract_raw_data.get_raw_data(db.size, db.st
 # dizionario contenente le tabelle e la relativa struttura (campi e tipo dei campi)
 patterns = patterns_extractor.get_patterns(database_path)
 
+# tronco il file (se presente)
+with open("result.tsv", "w"):
+    pass
+
 # itero su i dati delle diverse aree non allocate
 for area in unallocated_area:
     # cerco possibili record
