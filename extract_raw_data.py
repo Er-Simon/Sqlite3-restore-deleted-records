@@ -22,10 +22,10 @@ def get_raw_data(file_size, stream, page_size):
 
         stream.seek(offset, os.SEEK_SET)
 
-        # The one-byte flag at offset 0 indicating the b-tree page type
+        # il valore reperito è utilizzato per indicare il tipo della b-tree page 
         flag = int.from_bytes(stream.read(1), "big")
 
-        # A value of 13 (0x0d) means the page is a leaf table b-tree page
+        # Il valore 13 (0x0d) corrisponde al tipo leaf table b-tree page
         if flag == 13:
 
             # offset al primo freeblock della pagina

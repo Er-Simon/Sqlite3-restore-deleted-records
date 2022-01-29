@@ -36,7 +36,8 @@ class database:
     def __get_database_header(self):
         self.stream.seek(0, os.SEEK_SET)
 
-        # Every valid SQLite database file begins with the following 16 bytes (in hex): 53 51 4c 69 74 65 20 66 6f 72 6d 61 74 20 33 00. This byte sequence corresponds to the UTF-8 string "SQLite format 3" including the nul terminator character at the end.
+        # Ogni database SQLite valido inizia con i seguenti 16 byte (in hex): 53 51 4c 69 74 65 20 66 6f 72 6d 61 74 20 33 00
+        # questa sequenza corrisponde alla stringa "SQLite format 3"
         self.magic_header_string = self.stream.read(16)
       
         if self.magic_header_string.hex() != "53514c69746520666f726d6174203300":
@@ -46,8 +47,7 @@ class database:
         self.page_size = int.from_bytes(self.stream.read(2), byteorder='big')
         self.stream.seek(56 , os.SEEK_SET)
 
-        # The database text encoding. A value of 1 means UTF-8. A value of 2 means UTF-16le. A value of 3 means UTF-16be.
-        # la codifica è utilizzata per tutte le stringhe presenti nel db
+        # Il valore intero corrisponde alla codifica utilizzata per le stringhe 
         text_encoding_value = int.from_bytes(self.stream.read(4), byteorder='big')
 
         if text_encoding_value == 1:

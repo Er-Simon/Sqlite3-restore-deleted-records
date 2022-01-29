@@ -229,11 +229,11 @@ def analyze_unallocated_area(area, patterns, encoding):
 
     for index in range(len(area_hex)):
 
-        # B-tree Cell Format
-        # 1 - varint - Number of bytes of payload
-        # 2 - varint - RowID
+        # B-tree - formato delle celle
+        # 1 - varint - numero di bytes del payload
+        # 2 - varint - id della tow
         # 3 - byte array - Payload
-        # 4 - 4-byte integer -	Page number of first overflow page
+        # 4 - 4-byte integer -	Numero della prima pagina di overflow
         if area_hex[index] != "0x0":
 
             # parse_record mi restituirà il num di bytes da saltare se è riuscita a trovare un record
