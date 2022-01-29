@@ -4,7 +4,7 @@
 
 Lo script è stato testato su file SQLite del formato 3
 
-<h1>Utilizzo</h1>
+<h1>Esecuzione</h1>
 
 <h3>- Collocare un file di tipo SQLite3 all'altezza del file main.py</h3>
 
