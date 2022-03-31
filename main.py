@@ -28,10 +28,6 @@ report.set_schema_info(patterns)
 # recupero il dizionario in cui sono salvate le informazioni del report
 data = report.get_data()
 
-# tronco il file (se presente)
-with open("result.tsv", "w"):
-    pass 
-
 # itero su i dati delle diverse aree non allocate
 for area in unallocated_area:
     # cerco possibili record
