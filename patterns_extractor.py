@@ -29,13 +29,13 @@ def get_patterns(database_file):
         pattern[length][table] = []
 
         for data in results:
-            if data[2] == 'BLOB':
-                type_ = 'TEXT'
+            # ho fatto questo controllo perchè non esiste un serial type associato a DATETIME   https://www.sqlite.org/fileformat2.html#serialtype
+            if data[2] == 'DATETIME':
+                type_ = 'INTEGER'
             else:
                 type_ = data[2]
 
-            pattern[length][table].append((data[1],type_, data[3]))
-
+            pattern[length][table].append((data[1],type_, data[3], data[5]))
 
     conn.close()
 

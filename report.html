@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="it">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+
+  <title>Report - SQLite3 restore deleted records</title>
+
+  <style>
+    .my-list-group {
+      flex-direction: column;
+      padding-left: 0;
+      margin-bottom: 0;
+      border-radius: 0.25rem;
+    }
+
+    .my-adjust-text {
+      word-break: break-all;
+    }
+
+    .dropdown-menu {
+      padding: 0;
+    }
+
+    .my-table-border-radius {
+      border-radius: .25rem;
+      overflow: hidden;
+    }
+
+    @media only screen and (max-width: 767px) {
+      .my-margin {
+        margin-top: .75rem;
+      }
+    }
+
+    .active {
+      background-color: #6c757d !important;
+      border-color: #6c757d !important;
+    }
+  </style>
+
+  <script type='text/javascript' src="assets/js/jquery-3.6.0.min.js"></script>
+
+  <script>
+
+    var reportData = {};
+
+    let lastSelectedTable = false;
+
+    function loadContent() {
+      return $.ajax({
+        url: "./data.json",
+        async: false,
+        dataType: 'json',
+        success: function (json) {
+          reportData = json;
+        }
+      });
+    }
+
+    function changeTable(event) {
+
+      var tableName = event["target"]["innerText"].split('\n')[0];
+      var table = document.getElementById("table");
+
+      console.log(lastSelectedTable);
+
+      if (lastSelectedTable !== false) {
+        lastSelectedTable.classList.remove("active");
+        console.log("Rimosso");
+      }
+      
+      event["target"].classList.add("active");
+      lastSelectedTable = event["target"];
+
+      console.log(lastSelectedTable);
+
+      var content = "";
+
+      content = '<thead><tr><th scope="col">#</th>';
+
+      var header = reportData["data"][tableName]['schema'];
+      var fieldName = "";
+
+      header.forEach(field => {
+        fieldName = Object.keys(field)[0];
+        content += '<th scope="col" type="' + field[fieldName]["type"] + '" not_null="' + field[fieldName]["not_null"] + '" primary_key="' + field[fieldName]["primary_key"] + '" onmouseover="changeCellDetails(event)">' + fieldName + '</th>';
+      })
+
+      content += "</thead></tr><tbody>"
+      var records = reportData["data"][tableName]['records'];
+      var count = 1;
+
+      records.forEach(fields => {
+        content += '<tr><th scope="row">' + count + '</th>';
+        fields.forEach(field => {
+          content += '<td onmouseover="redirectEvent(event)">' + field + '</td>';
+        })
+        count++;
+        content += "</tr>";
+      })
+
+      content += "</tbody></table>";
+      table.innerHTML = content;
+    }
+
+    function changeCellDetails(event) {
+      
+      var dataType = document.getElementById("data-type");
+      var notNull = document.getElementById("not-null");
+      var primaryKey = document.getElementById("primary-key");
+
+      var values = event["target"]["attributes"];
+
+      dataType.innerText = "Tipo di dato: " + values[1]["nodeValue"]; 
+      notNull.innerText = "Not Null: " + (values[2]["nodeValue"] == 1 ? "True" : "False");
+      primaryKey.innerText = "Primary Key: " + (values[3]["nodeValue"] == 1 ? "True" : "False"); 
+    }
+
+    function redirectEvent(event) {
+      document.getElementsByTagName("th")[event["target"]["cellIndex"]].dispatchEvent(new event.constructor(event.type, event));
+    }
+
+  </script>
+</head>
+
+<body class="text-white bg-dark">
+  <div class="container-fluid">
+    <div class="row mb-5">
+      <div class="p-4 text-center">
+        <h1>SQLite3 restore deleted records</h1>
+        <hr>
+      </div>
+
+      <div class="col-md-2">
+        <h3 class="ms-2">Tabelle</h3>
+        <ul class="list-group my-adjust-text" id="list-tables">
+          <script>
+
+            $.when(loadContent()).done(function () {
+              window.addEventListener('load', function () {
+                console.log(reportData);
+
+                var details = document.getElementById("list-tables");
+
+                var content = "";
+
+                for (var table in reportData["data"]) {
+                  if ("records" in reportData["data"][table]) {
+                    content += '<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">' +
+                      table + '<span class="badge bg-primary rounded-pill">' + reportData["data"][table]['records'].length + '</span></a>';
+                  }
+                }
+
+                details.innerHTML = content;
+
+                const tables = [...details.getElementsByTagName("a")];
+
+                tables.forEach(item => {
+                  item.addEventListener('click', function (event) { changeTable(event); });
+                })              
+              })
+            })
+
+          </script>
+        </ul>
+      </div>
+      <div class="col-md-10 my-margin">
+        <h3 class="ms-2">Dettagli del report</h3>
+        <ul class="list-group my-adjust-text" id="report-details">
+
+          <script>
+            $.when(loadContent()).done(function () {
+              window.addEventListener('load', function () {
+                var details = document.getElementById("report-details");
+                var detailsItem = details.getElementsByTagName('li');
+
+                var count = 0;
+
+                for (var key in reportData["report_info"]) {
+                  detailsItem[count].innerText += " " + reportData["report_info"][key];
+                  count++;
+                }
+              })
+            })
+
+          </script>
+
+          <li class="list-group-item">Tempo della creazione del report:</li>
+          <li class="list-group-item">File:</li>
+          <li class="list-group-item">Path:</li>
+          <li class="list-group-item">Dimensione in byte:</li>
+          <li class="list-group-item">Codifica delle stringhe:</li>
+        </ul>
+        <br><br>
+        <div class="ms-2 mb-2">
+          <h3 class="mb-3">Visualizza i record</h3>
+          <span class="h4" style="font-weight: 400;">· Seleziona una tabella per visualizzarne i record recuperati</span>
+        </div>
+
+        <div class="ms-2 my-3">
+          <span class="h4" style="font-weight: 400;">· Posiziona il cursore sopra una cella per ottenerne i
+            dettagli</span>
+          <h4 class="mt-3"><span class="badge rounded-pill bg-primary me-3" id="data-type">Tipo di dato: NaN</span><span
+              class="badge rounded-pill bg-primary me-3" id="not-null">Not Null: NaN</span><span
+              class="badge rounded-pill bg-primary" id="primary-key">Primary Key: NaN</span></h4>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-light table-striped table-bordered my-table-border-radius" id="table">
+          </table>
+        </div>
+
+        <!--
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+              Dettagli del report
+            </button>
+           
+            <ul class="my-list-group dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <li class="list-group-item"><a class="dropdown-item">File: msgstore.db</a></li>
+              <li class="list-group-item"><a class="dropdown-item">Path: /home/ersa/Scrivania/Tesi.PY/Sqlite3 Restore deleted records</a></li>
+              <li class="list-group-item"><a class="dropdown-item">Tempo della creazione del report: 2022-03-30 00:39:02</a></li>
+            </ul>
+          </div>
+          -->
+      </div>
+
+    </div>
+  </div>
+
+  <script type='text/javascript' src="assets/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
