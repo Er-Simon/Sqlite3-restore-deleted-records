@@ -13,7 +13,7 @@ database_path = "msgstore.db"
 db = database_parser.database(database_path)
 
 # oggetto rappresentante le informazioni ottenute durante l'esecuzione dello script
-report = report_builder.report(database_path, db.size, db.text_encoding)
+report = report_builder.report(database_path, db.size, db.hash, db.text_encoding)
 
 # funzione per ottenere i dati presenti nello spazio non allocato delle B-tree leaf pages e dei dati presenti nei freeblock
 # inoltre sovrascrive o se non presente crea il file 'raw_data.tsv' contenente i dati grezzi ottenuti (printabili)

@@ -14,13 +14,15 @@ class report:
     text_encoding = None
     data = dict()
 
-    def __init__(self, path, size, text_encoding):
+    def __init__(self, path, size, hash, text_encoding):
         # tempo della creazione del report
         self.creation_time = datetime.now().replace(microsecond=0)
         # path in cui è situato il file e nome del file
         self.file_path, self.file_name = os.path.split(os.path.abspath(path))
         # dimensione in byte del file
         self.size = size
+        # hash del file
+        self.hash = hash
         # codifica utilizzata dal database per le stringhe
         self.text_encoding = text_encoding
         # salvo le informazioni nel dizionario "data"
@@ -32,6 +34,7 @@ class report:
         self.data["report_info"]["file_name"] = self.file_name
         self.data["report_info"]["file_path"] = self.file_path
         self.data["report_info"]["size"] = self.size
+        self.data["report_info"]["sha256sum"] = self.hash
         self.data["report_info"]["text_encoding"] = self.text_encoding
         self.data["data"] = dict()
 

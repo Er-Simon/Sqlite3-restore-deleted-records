@@ -1,6 +1,8 @@
 
 import os
 import errno
+import hashlib
+
 
 # classe rappresentante l'oggetto database
 # per informazioni relative all'header consultare la documentazione al seguente link:
@@ -10,6 +12,7 @@ class database:
     file_path = None
     valid = False
     size = 0
+    hash = None
     stream = None
     magic_header_string = None
     page_size = None
@@ -27,6 +30,14 @@ class database:
 
     def __get_file_size(self):
         return os.stat(self.file_path).st_size
+
+    def __get_file_hash(self):
+        sha256_hash = hashlib.sha256()
+
+        with open(self.file_path, "rb") as f:
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+            return sha256_hash.hexdigest()
 
     def __get_file_stream(self):
         if os.access(self.file_path, os.R_OK):
@@ -66,8 +77,10 @@ class database:
     def initialize(self):
         # controllo il file al path specificato esista
         self.__check_existence()
-        # ottendo la size del file in byte
+        # ottengo la size del file in byte
         self.size = self.__get_file_size()
+        # calcolo l'hash del file
+        self.hash = self.__get_file_hash()
 
         # se non ci sono nemmeno i 100 byte dell'header del database
         if self.size < 100:
